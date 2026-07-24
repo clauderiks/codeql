@@ -343,7 +343,7 @@ github.com/russross/blackfriday/v2
 # github.com/schollz/closestmatch v2.1.0+incompatible
 ## explicit
 github.com/schollz/closestmatch
-# github.com/sirupsen/logrus v1.8.1
+# github.com/sirupsen/logrus v1.8.3
 ## explicit; go 1.13
 github.com/sirupsen/logrus
 # github.com/square/go-jose/v3 v3.0.0-20200630053402-0a67ce9b0693
