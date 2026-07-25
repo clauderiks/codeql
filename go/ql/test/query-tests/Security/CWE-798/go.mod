@@ -7,7 +7,7 @@ require (
 	github.com/cristalhq/jwt/v3 v3.1.0
 	github.com/go-kit/kit v0.12.0
 	github.com/gogf/gf-jwt/v2 v2.0.1
-	github.com/golang-jwt/jwt/v4 v4.5.0
+	github.com/golang-jwt/jwt/v4 v4.5.2
 	github.com/iris-contrib/middleware/jwt v0.0.0-20230311205048-b568fe9b470f
 	github.com/kataras/iris/v12 v12.2.0
 	github.com/kataras/jwt v0.1.8
