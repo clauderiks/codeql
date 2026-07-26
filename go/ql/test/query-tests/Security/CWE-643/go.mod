@@ -7,7 +7,7 @@ require (
 	github.com/antchfx/htmlquery v1.2.2
 	github.com/antchfx/jsonquery v1.1.2
 	github.com/antchfx/xmlquery v1.3.1
-	github.com/antchfx/xpath v1.1.10
+	github.com/antchfx/xpath v1.3.6
 	github.com/go-xmlpath/xmlpath v0.0.0-20150820204837-860cbeca3ebc
 	github.com/jbowtie/gokogiri v0.0.0-20190301021639-37f655d3078f
 	github.com/lestrrat-go/libxml2 v0.0.0-20231124114421-99c71026c2f5
