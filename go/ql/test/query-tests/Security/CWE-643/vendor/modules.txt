@@ -19,8 +19,8 @@ github.com/antchfx/jsonquery
 # github.com/antchfx/xmlquery v1.3.1
 ## explicit; go 1.14
 github.com/antchfx/xmlquery
-# github.com/antchfx/xpath v1.1.10
-## explicit
+# github.com/antchfx/xpath v1.3.6
+## explicit; go 1.14
 github.com/antchfx/xpath
 # github.com/go-xmlpath/xmlpath v0.0.0-20150820204837-860cbeca3ebc
 ## explicit
