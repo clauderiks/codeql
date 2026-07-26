@@ -1,5 +1,5 @@
 module custom-queries-go-tests/constant-oauth2-state
 
-go 1.14
+go 1.23.0
 
-require golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
+require golang.org/x/oauth2 v0.27.0
