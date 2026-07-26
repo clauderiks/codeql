@@ -7,6 +7,7 @@ package acme
 import (
 	"crypto"
 	"crypto/x509"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -55,7 +56,37 @@ var (
 
 	// ErrNoAccount indicates that the Client's key has not been registered with the CA.
 	ErrNoAccount = errors.New("acme: account does not exist")
+
+	// errPreAuthorizationNotSupported indicates that the server does not
+	// support pre-authorization of identifiers.
+	errPreAuthorizationNotSupported = errors.New("acme: pre-authorization is not supported")
 )
+
+// A Subproblem describes an ACME subproblem as reported in an Error.
+type Subproblem struct {
+	// Type is a URI reference that identifies the problem type,
+	// typically in a "urn:acme:error:xxx" form.
+	Type string
+	// Detail is a human-readable explanation specific to this occurrence of the problem.
+	Detail string
+	// Instance indicates a URL that the client should direct a human user to visit
+	// in order for instructions on how to agree to the updated Terms of Service.
+	// In such an event CA sets StatusCode to 403, Type to
+	// "urn:ietf:params:acme:error:userActionRequired", and adds a Link header with relation
+	// "terms-of-service" containing the latest TOS URL.
+	Instance string
+	// Identifier may contain the ACME identifier that the error is for.
+	Identifier *AuthzID
+}
+
+func (sp Subproblem) String() string {
+	str := fmt.Sprintf("%s: ", sp.Type)
+	if sp.Identifier != nil {
+		str += fmt.Sprintf("[%s: %s] ", sp.Identifier.Type, sp.Identifier.Value)
+	}
+	str += sp.Detail
+	return str
+}
 
 // Error is an ACME error, defined in Problem Details for HTTP APIs doc
 // http://tools.ietf.org/html/draft-ietf-appsawg-http-problem.
@@ -76,10 +107,21 @@ type Error struct {
 	// Header is the original server error response headers.
 	// It may be nil.
 	Header http.Header
+	// Subproblems may contain more detailed information about the individual problems
+	// that caused the error. This field is only sent by RFC 8555 compatible ACME
+	// servers. Defined in RFC 8555 Section 6.7.1.
+	Subproblems []Subproblem
 }
 
 func (e *Error) Error() string {
-	return fmt.Sprintf("%d %s: %s", e.StatusCode, e.ProblemType, e.Detail)
+	str := fmt.Sprintf("%d %s: %s", e.StatusCode, e.ProblemType, e.Detail)
+	if len(e.Subproblems) > 0 {
+		str += fmt.Sprintf("; subproblems:")
+		for _, sp := range e.Subproblems {
+			str += fmt.Sprintf("\n\t%s", sp)
+		}
+	}
+	return str
 }
 
 // AuthorizationError indicates that an authorization for an identifier
@@ -112,17 +154,24 @@ func (a *AuthorizationError) Error() string {
 
 // OrderError is returned from Client's order related methods.
 // It indicates the order is unusable and the clients should start over with
-// AuthorizeOrder.
+// AuthorizeOrder. A Problem description may be provided with details on
+// what caused the order to become unusable.
 //
 // The clients can still fetch the order object from CA using GetOrder
 // to inspect its state.
 type OrderError struct {
 	OrderURL string
 	Status   string
+	// Problem is the error that occurred while processing the order.
+	Problem *Error
 }
 
 func (oe *OrderError) Error() string {
-	return fmt.Sprintf("acme: order %s status: %s", oe.OrderURL, oe.Status)
+	str := fmt.Sprintf("acme: order %s status: %s", oe.OrderURL, oe.Status)
+	if oe.Problem != nil {
+		str += fmt.Sprintf("; problem: %s", oe.Problem)
+	}
+	return str
 }
 
 // RateLimit reports whether err represents a rate limit error and
@@ -199,6 +248,28 @@ type Account struct {
 	//
 	// It is non-RFC 8555 compliant and is obsoleted by OrdersURL.
 	Certificates string
+
+	// ExternalAccountBinding represents an arbitrary binding to an account of
+	// the CA which the ACME server is tied to.
+	// See https://tools.ietf.org/html/rfc8555#section-7.3.4 for more details.
+	ExternalAccountBinding *ExternalAccountBinding
+}
+
+// ExternalAccountBinding contains the data needed to form a request with
+// an external account binding.
+// See https://tools.ietf.org/html/rfc8555#section-7.3.4 for more details.
+type ExternalAccountBinding struct {
+	// KID is the Key ID of the symmetric MAC key that the CA provides to
+	// identify an external account from ACME.
+	KID string
+
+	// Key is the bytes of the symmetric key that the CA provides to identify
+	// the account. Key must correspond to the KID.
+	Key []byte
+}
+
+func (e *ExternalAccountBinding) String() string {
+	return fmt.Sprintf("&{KID: %q, Key: redacted}", e.KID)
 }
 
 // Directory is ACME server discovery data.
@@ -229,7 +300,7 @@ type Directory struct {
 	// KeyChangeURL allows to perform account key rollover flow.
 	KeyChangeURL string
 
-	// Term is a URI identifying the current terms of service.
+	// Terms is a URI identifying the current terms of service.
 	Terms string
 
 	// Website is an HTTP or HTTPS URL locating a website
@@ -238,20 +309,12 @@ type Directory struct {
 
 	// CAA consists of lowercase hostname elements, which the ACME server
 	// recognises as referring to itself for the purposes of CAA record validation
-	// as defined in RFC6844.
+	// as defined in RFC 6844.
 	CAA []string
 
 	// ExternalAccountRequired indicates that the CA requires for all account-related
 	// requests to include external account binding information.
 	ExternalAccountRequired bool
-}
-
-// rfcCompliant reports whether the ACME server implements RFC 8555.
-// Note that some servers may have incomplete RFC implementation
-// even if the returned value is true.
-// If rfcCompliant reports false, the server most likely implements draft-02.
-func (d *Directory) rfcCompliant() bool {
-	return d.OrderURL != ""
 }
 
 // Order represents a client's request for a certificate.
@@ -389,7 +452,7 @@ func DomainIDs(names ...string) []AuthzID {
 
 // IPIDs creates a slice of AuthzID with "ip" identifier type.
 // Each element of addr is textual form of an address as defined
-// in RFC1123 Section 2.1 for IPv4 and in RFC5952 Section 4 for IPv6.
+// in RFC 1123 Section 2.1 for IPv4 and in RFC 5952 Section 4 for IPv6.
 func IPIDs(addr ...string) []AuthzID {
 	a := make([]AuthzID, len(addr))
 	for i, v := range addr {
@@ -476,6 +539,16 @@ type Challenge struct {
 	// when this challenge was used.
 	// The type of a non-nil value is *Error.
 	Error error
+
+	// Payload is the JSON-formatted payload that the client sends
+	// to the server to indicate it is ready to respond to the challenge.
+	// When unset, it defaults to an empty JSON object: {}.
+	// For most challenges, the client must not set Payload,
+	// see https://tools.ietf.org/html/rfc8555#section-7.5.1.
+	// Payload is used only for newer challenges (such as "device-attest-01")
+	// where the client must send additional data for the server to validate
+	// the challenge.
+	Payload json.RawMessage
 }
 
 // wireChallenge is ACME JSON challenge representation.
@@ -511,20 +584,23 @@ func (c *wireChallenge) challenge() *Challenge {
 // wireError is a subset of fields of the Problem Details object
 // as described in https://tools.ietf.org/html/rfc7807#section-3.1.
 type wireError struct {
-	Status   int
-	Type     string
-	Detail   string
-	Instance string
+	Status      int
+	Type        string
+	Detail      string
+	Instance    string
+	Subproblems []Subproblem
 }
 
 func (e *wireError) error(h http.Header) *Error {
-	return &Error{
+	err := &Error{
 		StatusCode:  e.Status,
 		ProblemType: e.Type,
 		Detail:      e.Detail,
 		Instance:    e.Instance,
 		Header:      h,
+		Subproblems: e.Subproblems,
 	}
+	return err
 }
 
 // CertOption is an optional argument type for the TLS ChallengeCert methods for
@@ -550,7 +626,7 @@ func (*certOptKey) privateCertOpt() {}
 //
 // In TLS ChallengeCert methods, the template is also used as parent,
 // resulting in a self-signed certificate.
-// The DNSNames field of t is always overwritten for tls-sni challenge certs.
+// The DNSNames or IPAddresses fields of t are always overwritten for tls-alpn challenge certs.
 func WithTemplate(t *x509.Certificate) CertOption {
 	return (*certOptTemplate)(t)
 }

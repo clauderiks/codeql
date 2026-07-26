@@ -1,6 +1,6 @@
 module main
 
-go 1.23
+go 1.25.0
 
 require (
 	github.com/astaxie/beego v1.12.3
@@ -24,10 +24,10 @@ require (
 	github.com/prometheus/procfs v0.6.0 // indirect
 	github.com/shiena/ansicolor v0.0.0-20151119151921-a422bbe96644 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
-	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9 // indirect
-	golang.org/x/net v0.0.0-20200625001655-4c5254603344 // indirect
-	golang.org/x/sys v0.0.0-20220412211240-33da011f77ad // indirect
-	golang.org/x/text v0.3.2 // indirect
+	golang.org/x/crypto v0.52.0 // indirect
+	golang.org/x/net v0.54.0 // indirect
+	golang.org/x/sys v0.45.0 // indirect
+	golang.org/x/text v0.37.0 // indirect
 	google.golang.org/protobuf v1.26.0-rc.1 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 )
