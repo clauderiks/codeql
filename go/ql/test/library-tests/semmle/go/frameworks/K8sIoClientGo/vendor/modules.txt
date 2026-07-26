@@ -58,7 +58,7 @@ gopkg.in/inf.v0
 # gopkg.in/yaml.v2 v2.2.8
 ## explicit
 gopkg.in/yaml.v2
-# k8s.io/api v0.19.0
+# k8s.io/api v0.19.6
 ## explicit; go 1.15
 k8s.io/api/admissionregistration/v1
 k8s.io/api/admissionregistration/v1beta1
@@ -101,7 +101,7 @@ k8s.io/api/settings/v1alpha1
 k8s.io/api/storage/v1
 k8s.io/api/storage/v1alpha1
 k8s.io/api/storage/v1beta1
-# k8s.io/apimachinery v0.19.0 => k8s.io/apimachinery v0.19.0
+# k8s.io/apimachinery v0.19.6 => k8s.io/apimachinery v0.19.0
 ## explicit; go 1.15
 k8s.io/apimachinery/pkg/api/errors
 k8s.io/apimachinery/pkg/api/meta
@@ -138,7 +138,7 @@ k8s.io/apimachinery/pkg/util/yaml
 k8s.io/apimachinery/pkg/version
 k8s.io/apimachinery/pkg/watch
 k8s.io/apimachinery/third_party/forked/golang/reflect
-# k8s.io/client-go v0.19.0
+# k8s.io/client-go v0.19.6
 ## explicit; go 1.15
 k8s.io/client-go/kubernetes/scheme
 k8s.io/client-go/kubernetes/typed/core/v1
