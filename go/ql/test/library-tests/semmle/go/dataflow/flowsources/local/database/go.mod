@@ -12,7 +12,7 @@ require (
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/rqlite/gorqlite v0.0.0-20250128004930-114c7828b55a
 	github.com/uptrace/bun v1.2.11
-	go.mongodb.org/mongo-driver v1.17.3
+	go.mongodb.org/mongo-driver v1.17.7
 	gorm.io/gorm v1.25.12
 )
 
