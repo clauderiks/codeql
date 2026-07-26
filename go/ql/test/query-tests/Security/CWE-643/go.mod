@@ -1,6 +1,6 @@
 module main
 
-go 1.21
+go 1.25.0
 
 require (
 	github.com/ChrisTrenkamp/goxpath v0.0.0-20190607011252-c5096ec8773d
@@ -17,8 +17,8 @@ require (
 require (
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	golang.org/x/net v0.0.0-20200813134508-3edf25e44fcc // indirect
-	golang.org/x/text v0.3.0 // indirect
+	golang.org/x/net v0.55.0 // indirect
+	golang.org/x/text v0.37.0 // indirect
 	gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 // indirect
 	gopkg.in/xmlpath.v2 v2.0.0-20150820204837-860cbeca3ebc // indirect
 )
