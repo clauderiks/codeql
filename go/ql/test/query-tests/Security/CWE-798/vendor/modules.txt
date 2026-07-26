@@ -197,7 +197,7 @@ github.com/gogf/gf/v2/util/gtag
 github.com/gogf/gf/v2/util/guid
 github.com/gogf/gf/v2/util/gutil
 github.com/gogf/gf/v2/util/gvalid
-# github.com/golang-jwt/jwt/v4 v4.5.0
+# github.com/golang-jwt/jwt/v4 v4.5.2
 ## explicit; go 1.16
 github.com/golang-jwt/jwt/v4
 # github.com/golang/protobuf v1.5.4
