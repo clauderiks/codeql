@@ -1,9 +1,9 @@
 module wcd
 
-go 1.21
+go 1.22
 
 require (
-	github.com/go-chi/chi/v5 v5.0.10
+	github.com/go-chi/chi/v5 v5.2.4
 	github.com/gofiber/fiber/v2 v2.52.14
 	github.com/julienschmidt/httprouter v1.3.0
 )
